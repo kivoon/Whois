@@ -26,7 +26,6 @@ public class User implements Closeable
 	{
 		setField(Field.PLAYER_NAME, player_name);
 		file = new UserFile(this);
-		setField(Field.PLAYER_NAME, player_name);
 		setStat(Stat.SESSION_TIME, 0L);
 		startTimers();
 	}
@@ -34,6 +33,7 @@ public class User implements Closeable
 	public User(Player player)
 	{
 		this(player.getName());
+		setField(Field.PLAYER_NAME, player.getName());
 	}
 	
 	private void startTimers()
