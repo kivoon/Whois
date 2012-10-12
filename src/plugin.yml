@@ -1,0 +1,10 @@
+name: Whois
+version: 0.1
+main: com.deaboy.whois.Whois
+website:
+author: Deaboy
+commands:
+    whois:
+        usage: Use /whois [player] to get info on a player
+        description: Gets any saved information on the given player
+        aliases: [who]
