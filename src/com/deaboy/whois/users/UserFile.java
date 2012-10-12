@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
 import com.deaboy.whois.Whois;
+import com.deaboy.whois.Settings.SettingBool;
 import com.deaboy.whois.users.User.Field;
 import com.deaboy.whois.users.User.Stat;
 
@@ -18,9 +19,6 @@ public class UserFile extends Properties implements Closeable
 {
 	private static final long serialVersionUID = 1L;
 	private static final File directory = new File(Whois.getDirectory() + "/users");
-	
-	private FileInputStream input = null;
-	private FileOutputStream output;
 	
 	private User user;
 	private String name;
@@ -78,56 +76,33 @@ public class UserFile extends Properties implements Closeable
 		saveFile();
 	}
 	
-	public void saveField(Field f)
-	{
-		clear();
-		put(f, user.getField(f));
-		saveFile();
-		loadFile();
-	}
-	
-	public void saveStat(Stat s)
-	{
-		clear();
-		put(s, user.getStat(s));
-		saveFile();
-		loadFile();
-	}
-	
 	public void loadFile()
 	{
-		if (input == null)
+		File file = new File(directory + "/" + name.toLowerCase() + ".who");
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		if (!file.exists())
 		{
-			File file = new File(directory + "/" + name.toLowerCase() + ".who");
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-			if (!file.exists())
+			if (Whois.getSettings().getSetting(SettingBool.WHITELIST))
 			{
-				if (Whois.getSettings().getBoolean("whitelist", false))
-				{
-					Bukkit.getLogger().log(Level.INFO, "Whois file for " + user.getName() + " was cancelled.");
+				Bukkit.getLogger().log(Level.INFO, "Whois file for " + user.getName() + " was cancelled.");
+				return;
+			}
+			else
+			{
+				try {
+					file.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
 					return;
 				}
-				else
-				{
-					try {
-						file.createNewFile();
-					} catch (IOException e) {
-						e.printStackTrace();
-						return;
-					}
-				}
-			}
-			try {
-				input = new FileInputStream(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
 			}
 		}
 		try {
+			FileInputStream input = new FileInputStream(file);
 			load(input);
+			input.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -136,39 +111,31 @@ public class UserFile extends Properties implements Closeable
 	
 	public void saveFile()
 	{
-		if (output == null)
+		File file = new File(directory + "/" + name.toLowerCase() + ".who");
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		if (!file.exists())
 		{
-			File file = new File(directory + "/" + name.toLowerCase() + ".who");
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-			if (!file.exists())
+			if (Whois.getSettings().getSetting(SettingBool.WHITELIST))
 			{
-				if (Whois.getSettings().getBoolean("whitelist", false))
-				{
-					Bukkit.getLogger().log(Level.INFO, "Whois file for " + user.getName() + " was cancelled.");
-					return;
-				}
-				else
-				{
-					try {
-						file.createNewFile();
-					} catch (IOException e) {
-						e.printStackTrace();
-						return;
-					}
-				}
-			}
-			try {
-				output = new FileOutputStream(file);
-			} catch (IOException e) {
-				e.printStackTrace();
+				Bukkit.getLogger().log(Level.INFO, "Whois file for " + user.getName() + " was cancelled.");
 				return;
 			}
+			else
+			{
+				try {
+					file.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+			}
 		}
-
 		try {
+			FileOutputStream output = new FileOutputStream(file);
 			store(output, "- Whois: " + user.getName() + "'s Info File -");
+			output.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -184,23 +151,5 @@ public class UserFile extends Properties implements Closeable
 	{
 		saveUser();
 		user = null;
-		try
-		{
-			if (input != null) input.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		input = null;
-		try
-		{
-			if (output != null) output.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		output = null;
 	}
 }

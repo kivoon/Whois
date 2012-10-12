@@ -15,89 +15,54 @@ public class Settings extends Properties implements Closeable
 	public Settings()
 	{
 		loadFile();
-	}
-	
-	public void saveProperty(String prop, String val)
-	{
-		put (prop, val);
+		loadValues();
 		saveFile();
 	}
 	
-	public String getString(String prop, String def)
+	
+	// -------- SETTERS -------- //
+	
+	public void saveSetting(SettingBool setting, Boolean val)
 	{
-		if (containsKey(prop))
+		put(setting.toString(), val.toString());
+		saveFile();
+	}
+	
+	public void saveSetting(SettingString setting, String val)
+	{
+		put(setting.toString(), val);
+		saveFile();
+	}
+	
+	
+	// -------- GETTERS -------- //
+	
+	public boolean getSetting(SettingBool setting)
+	{
+		try
 		{
-			return getProperty(prop);
+			return Boolean.parseBoolean(getProperty(setting.toString()));
 		}
-		else
+		catch (NumberFormatException e)
 		{
-			saveProperty(prop, def);
-			return def;
+			return setting.getDefault();
 		}
 	}
 	
-	public boolean getBoolean(String prop, Boolean def)
+	public String getSetting(SettingString setting)
 	{
-		if (containsKey(prop))
+		try
 		{
-			try
-			{
-				return Boolean.parseBoolean(getProperty(prop));
-			}
-			catch (NumberFormatException e)
-			{
-				saveProperty(prop, def.toString());
-				return def;
-			}
+			return getProperty(setting.toString());
 		}
-		else
+		catch (NumberFormatException e)
 		{
-			saveProperty(prop, def.toString());
-			return def;
+			return setting.getDefault();
 		}
 	}
 	
-	public int getInteger(String prop, Integer def)
-	{
-		if (containsKey(prop))
-		{
-			try
-			{
-				return Integer.parseInt(getProperty(prop));
-			}
-			catch (NumberFormatException e)
-			{
-				saveProperty(prop, def.toString());
-				return def;
-			}
-		}
-		else
-		{
-			saveProperty(prop, def.toString());
-			return def;
-		}
-	}
 	
-	public double getDouble(String prop, Double def)
-	{
-		if (containsKey(prop))
-		{
-			try
-			{
-				return Double.parseDouble(getProperty(prop));
-			}
-			catch (NumberFormatException e)
-			{
-				saveProperty(prop, def.toString());
-				return def;
-			}
-		}
-		else
-		{
-			saveProperty(prop, def.toString());
-			return def;
-		}
-	}
+	// -------- FILE SAVING/LOADING -------- //
 	
 	private void loadFile()
 	{
@@ -121,7 +86,6 @@ public class Settings extends Properties implements Closeable
 			e.printStackTrace();
 			return;
 		}
-		saveFile();
 	}
 	
 	private void saveFile()
@@ -147,6 +111,115 @@ public class Settings extends Properties implements Closeable
 			return;
 		}
 	}
+	
+	private void loadValues()
+	{
+		for (SettingBool s : SettingBool.values())
+		{
+			if (!containsKey(s.toString()))
+				put(s.toString(), s.getDefault().toString());
+		}
+		for (SettingString s : SettingString.values())
+		{
+			if (!containsKey(s.toString()))
+				put(s.toString(), s.getDefault());
+		}
+	}
+	
+	
+	// -------- ENUMERATORS -------- //
+	
+	public enum SettingBool
+	{
+		WHITELIST,
+		REAL_NAMES,
+		NAME_COLORS,
+		TRACK_STATS,
+		WHOIS_STICK,
+		PUBLIC_WHOIS,
+		PUBLIC_STATS,
+		PUBLIC_WHOIS_SENSITIVE;
+		
+		public String toString()
+		{
+			switch (this)
+			{
+			case WHITELIST:
+				return "enable_whitelist";
+			case REAL_NAMES:
+				return "enable_real_names";
+			case NAME_COLORS:
+				return "enable_name_colors";
+			case TRACK_STATS:
+				return "enable_stat_tracking";
+			case WHOIS_STICK:
+				return "enable_whois_stick";
+			case PUBLIC_WHOIS:
+				return "enable_public_whois";
+			case PUBLIC_STATS:
+				return "enable_public_stats";
+			case PUBLIC_WHOIS_SENSITIVE:
+				return "enable_public_whois_sensitive";
+			default:
+				return null;
+			}
+		}
+		
+		public Boolean getDefault()
+		{
+			switch (this)
+			{
+			case WHITELIST:
+				return false;
+			case REAL_NAMES:
+				return true;
+			case NAME_COLORS:
+				return true;
+			case TRACK_STATS:
+				return true;
+			case WHOIS_STICK:
+				return true;
+			case PUBLIC_WHOIS:
+				return true;
+			case PUBLIC_STATS:
+				return true;
+			case PUBLIC_WHOIS_SENSITIVE:
+				return false;
+			default:
+				return false;
+			}
+		}
+	}
+	
+	public enum SettingString
+	{
+		MESSAGE_WHITELIST;
+		
+		public String toString()
+		{
+			switch (this)
+			{
+			case MESSAGE_WHITELIST:
+				return "message_whitelist";
+			default:
+				return null;
+			}
+		}
+		
+		public String getDefault()
+		{
+			switch (this)
+			{
+			case MESSAGE_WHITELIST:
+				return "You are not whitelisted on this server";
+			default:
+				return null;
+			}
+		}
+	}
+	
+	
+	// -------- CLOSER -------- //
 	
 	public void close()
 	{

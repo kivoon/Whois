@@ -3,17 +3,21 @@ package com.deaboy.whois;
 import java.io.File;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.deaboy.whois.Settings.SettingBool;
+import com.deaboy.whois.Settings.SettingString;
 import com.deaboy.whois.users.User;
+import com.deaboy.whois.users.UserFile;
 
 public class Whois extends JavaPlugin
 {
 	private static Whois instance;
 	private static EventListener listener;
 	private static Settings settings;
-	private final static File directory = new File("plugins/McWhois");
+	private final static File directory = new File("plugins/Whois");
 	
 	private HashMap<String, User> users = new HashMap<String, User>();
 	
@@ -29,6 +33,16 @@ public class Whois extends JavaPlugin
 		new Commands();
 		
 		directory.mkdirs();
+		
+		// Load users, remove players who shouldn't be here
+		boolean whitelist = settings.getSetting(SettingBool.WHITELIST);
+		for (Player p : Bukkit.getOnlinePlayers())
+		{
+			if (whitelist && !UserFile.exists(p.getName()))
+				p.kickPlayer(settings.getSetting(SettingString.MESSAGE_WHITELIST));
+			else
+				loadUser(p);
+		}
 	}
 	
 	@Override
@@ -36,6 +50,12 @@ public class Whois extends JavaPlugin
 	{
 		listener.close();
 		settings.close();
+		
+		for (User u :users.values())
+		{
+			u.close();
+		}
+		users.clear();
 	}
 	
 	

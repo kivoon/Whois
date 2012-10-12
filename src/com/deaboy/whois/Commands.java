@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import com.deaboy.whois.Settings.SettingBool;
 import com.deaboy.whois.users.User;
 import com.deaboy.whois.users.UserFile;
 import com.deaboy.whois.users.User.Field;
@@ -52,7 +53,7 @@ public class Commands implements CommandExecutor
 	
 	public static void sendWhoisInfo(CommandSender sender, String user)
 	{
-		if (Whois.getSettings().getBoolean("opsonly", false) && !sender.isOp())
+		if (!Whois.getSettings().getSetting(SettingBool.PUBLIC_WHOIS) && !sender.isOp())
 		{
 			sender.sendMessage(ChatColor.RED + "Only server operators have access to this command.");
 			return;
@@ -82,17 +83,17 @@ public class Commands implements CommandExecutor
 			sender.sendMessage(pre + "Date Joined:  " + u.getField(Field.TIME_JOINED));
 			empty = false;
 		}
-		if (!u.getField(Field.PHONE).isEmpty() && sender.isOp())
+		if (!u.getField(Field.PHONE).isEmpty() && (sender.isOp() || Whois.getSettings().getSetting(SettingBool.PUBLIC_WHOIS_SENSITIVE)))
 		{
 			sender.sendMessage(pre + "Phone:  " + u.getField(Field.PHONE));
 			empty = false;
 		}
-		if (!u.getField(Field.EMAIL).isEmpty() && sender.isOp())
+		if (!u.getField(Field.EMAIL).isEmpty() && (sender.isOp() || Whois.getSettings().getSetting(SettingBool.PUBLIC_WHOIS_SENSITIVE)))
 		{
 			sender.sendMessage(pre + "Email:  " + u.getField(Field.EMAIL));
 			empty = false;
 		}
-		if (!u.getField(Field.LOCATION).isEmpty() && sender.isOp())
+		if (!u.getField(Field.LOCATION).isEmpty() && (sender.isOp() || Whois.getSettings().getSetting(SettingBool.PUBLIC_WHOIS_SENSITIVE)))
 		{
 			sender.sendMessage(pre + "Location:  " + u.getField(Field.LOCATION));
 			empty = false;
@@ -106,13 +107,11 @@ public class Commands implements CommandExecutor
 		{
 			u.close();
 		}
-		
-		u.close();
 	}
 	
 	public static void sendWhoisStats(CommandSender sender, String user)
 	{
-		if (Whois.getSettings().getBoolean("opsonly", false) && !sender.isOp())
+		if (!Whois.getSettings().getSetting(SettingBool.PUBLIC_STATS) && !sender.isOp())
 		{
 			sender.sendMessage(ChatColor.RED + "Only server operators have access to this command.");
 			return;
