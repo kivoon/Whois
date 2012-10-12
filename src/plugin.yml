@@ -8,3 +8,7 @@ commands:
         usage: Use /whois [player] to get info on a player
         description: Gets any saved information on the given player
         aliases: [who]
+    stats:
+        usage: User /stat [player] to get the stats of that player
+        description: Gets any saved statistics on the given player
+        aliases: [statistics,stat]

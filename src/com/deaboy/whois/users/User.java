@@ -26,6 +26,8 @@ public class User implements Closeable
 	{
 		setField(Field.PLAYER_NAME, player_name);
 		file = new UserFile(this);
+		setField(Field.PLAYER_NAME, player_name);
+		setStat(Stat.SESSION_TIME, 0L);
 		startTimers();
 	}
 	
@@ -63,15 +65,15 @@ public class User implements Closeable
 	
 	public String getField(Field f)
 	{
-		if (fields.containsKey(f))
+		String s = fields.get(f);
+		
+		if (s == null)
 		{
-			return fields.get(f);
+			s = "";
+			fields.put(f, s);
 		}
-		else
-		{
-			fields.put(f, new String());
-			return new String();
-		}
+		
+		return s;
 	}
 	
 	public String getName()
@@ -81,15 +83,15 @@ public class User implements Closeable
 	
 	public Long getStat(Stat s)
 	{
-		if (stats.containsKey(s))
+		Long l = stats.get(s);
+		
+		if (l == null)
 		{
-			return stats.get(s);
+			l = 0L;
+			stats.put(s, l);
 		}
-		else
-		{
-			stats.put(s, 0L);
-			return 0L;
-		}
+		
+		return l;
 	}
 	
 	
@@ -122,9 +124,12 @@ public class User implements Closeable
 	
 	public void close()
 	{
+		if (file != null)
+		{
+			file.saveUser();
+			file.close();
+		}
 		
-		
-		file.close();
 		file = null;
 		
 		Bukkit.getScheduler().cancelTask(sched_save);
@@ -211,6 +216,35 @@ public class User implements Closeable
 				return "logins";
 			case DIAMONDS:
 				return "collected_diamonds";
+			default:
+				return null;
+			}
+		}
+		
+		public String getLabel()
+		{
+			switch (this)
+			{
+			case TOTAL_TIME:
+				return "Total Play Time";
+			case SESSION_TIME:
+				return "Current Session Time";
+			case DEATH_COUNT:
+				return "Death Count";
+			case DAMAGE_TAKEN:
+				return "Damage Taken";
+			case DAMAGE_DEALT:
+				return "Damage Dealth";
+			case KILLS_HOSTILE:
+				return "Hostile Mobs Killed";
+			case KILLS_PASSIVE:
+				return "Passive Mobs Killed";
+			case KILLS_PLAYERS:
+				return "Players Killed";
+			case LOG_INS:
+				return "Logins";
+			case DIAMONDS:
+				return "Diamonds Mined";
 			default:
 				return null;
 			}
