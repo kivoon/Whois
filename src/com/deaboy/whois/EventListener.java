@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.deaboy.whois.Settings.SettingBool;
@@ -132,6 +133,16 @@ public class EventListener implements Listener, Closeable
 			e.setQuitMessage(message);
 			
 			Whois.unloadUser(e.getPlayer());
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerKick(PlayerKickEvent e)
+	{
+		if (!UserFile.exists(e.getPlayer().getName()) && Whois.getSettings().getSetting(SettingBool.WHITELIST))
+		{
+			e.setLeaveMessage(null);
+			return;
 		}
 	}
 	
