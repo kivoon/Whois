@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -172,7 +173,8 @@ public class EventListener implements Listener, Closeable
 		
 		if (e.getBlock().getType() == Material.DIAMOND_ORE)
 		{
-			u.incrementStat(Stat.DIAMONDS);
+			if (!e.getPlayer().getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH))
+				u.incrementStat(Stat.DIAMONDS);
 		}
 	}
 	
