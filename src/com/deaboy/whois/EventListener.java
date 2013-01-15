@@ -214,6 +214,8 @@ public class EventListener implements Listener, Closeable
 			return;
 		}
 		User u;
+		if (e == null || e.getEntity() == null || e.getEntity().getLastDamageCause() == null)
+			return;
 		if (e.getEntity().getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK)
 		{
 			if (((EntityDamageByEntityEvent) e.getEntity().getLastDamageCause()).getDamager().getType() == EntityType.PLAYER)
