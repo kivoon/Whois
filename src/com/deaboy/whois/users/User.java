@@ -234,7 +234,7 @@ public class User implements Closeable
 			case DAMAGE_TAKEN:
 				return "Damage Taken";
 			case DAMAGE_DEALT:
-				return "Damage Dealth";
+				return "Damage Dealt";
 			case KILLS_HOSTILE:
 				return "Hostile Mobs Killed";
 			case KILLS_PASSIVE:
