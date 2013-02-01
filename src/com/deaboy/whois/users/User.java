@@ -39,15 +39,15 @@ public class User implements Closeable
 	private void startTimers()
 	{
 		last_time = new Date().getTime();
-		sched_save = Bukkit.getScheduler().scheduleAsyncRepeatingTask(Whois.getInstance(), new Runnable()
+		sched_save = Bukkit.getScheduler().runTaskTimerAsynchronously(Whois.getInstance(), new Runnable()
 				{
 					@Override
 					public void run()
 					{
 						file.saveUser();
 					}
-				}, 200L, 200L);
-		sched_time = Bukkit.getScheduler().scheduleAsyncRepeatingTask(Whois.getInstance(), new Runnable()
+				}, 200L, 200L).getTaskId();
+		sched_time = Bukkit.getScheduler().runTaskTimerAsynchronously(Whois.getInstance(), new Runnable()
 				{
 					@Override
 					public void run()
@@ -57,7 +57,7 @@ public class User implements Closeable
 						incrementStat(Stat.TOTAL_TIME, current_time - last_time);
 						last_time = current_time;
 					}
-				}, 1L, 200L);
+				}, 1L, 200L).getTaskId();
 	}
 	
 	
